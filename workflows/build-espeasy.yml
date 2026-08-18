@@ -1,0 +1,64 @@
+name: Build ESPEasy ESP-01 1MB
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this small build project
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Fetch exact ESPEasy mega-20260720 source
+        shell: bash
+        run: |
+          git init ESPEasy
+          cd ESPEasy
+          git remote add origin https://github.com/letscontrolit/ESPEasy.git
+          git fetch --depth 1 origin 8ceb5eeeb1dad281196f072f2fec9e43469f8798
+          git checkout --detach FETCH_HEAD
+          cp ../Custom.h src/Custom.h
+
+      - name: Install ESPEasy build dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y binutils build-essential libffi-dev libgit2-dev
+          python -m pip install --upgrade pip
+          pip install uv
+          cd ESPEasy
+          uv pip install --system -r requirements.txt
+
+      - name: Prepare PlatformIO packages
+        shell: bash
+        run: |
+          cd ESPEasy
+          pio pkg update -e custom_274_ESP8266_1M
+
+      - name: Build firmware
+        shell: bash
+        run: |
+          cd ESPEasy
+          pio run -e custom_274_ESP8266_1M
+          test -f .pio/build/custom_274_ESP8266_1M/firmware.bin
+          cp .pio/build/custom_274_ESP8266_1M/firmware.bin ../ESPEasy_mega_20260720_ESP01_1M_SHT35_MQTT_DS18B20_Rules.bin
+          cd ..
+          sha256sum ESPEasy_mega_20260720_ESP01_1M_SHT35_MQTT_DS18B20_Rules.bin > SHA256.txt
+
+      - name: Upload flashable firmware
+        uses: actions/upload-artifact@v7
+        with:
+          name: ESPEasy-ESP01-1M-SHT35-MQTT-DS18B20-Rules
+          path: |
+            ESPEasy_mega_20260720_ESP01_1M_SHT35_MQTT_DS18B20_Rules.bin
+            SHA256.txt
+          if-no-files-found: error
