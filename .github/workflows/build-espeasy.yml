@@ -9,6 +9,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout this small build project
         uses: actions/checkout@v7
@@ -49,8 +50,18 @@ jobs:
         run: |
           cd ESPEasy
           pio run -e custom_274_ESP8266_1M
-          test -f .pio/build/custom_274_ESP8266_1M/firmware.bin
-          cp .pio/build/custom_274_ESP8266_1M/firmware.bin ../ESPEasy_mega_20260720_ESP01_1M_SHT35_MQTT_DS18B20_Rules.bin
+
+          BINFILE=$(find build_output/bin -maxdepth 1 -type f -name '*custom_274_ESP8266_1M.bin' | head -n 1)
+
+          if [ -z "$BINFILE" ]; then
+            echo "Keine passende BIN-Datei gefunden"
+            exit 1
+          fi
+
+          echo "Gefundene Firmware: $BINFILE"
+
+          cp "$BINFILE" ../ESPEasy_mega_20260720_ESP01_1M_SHT35_MQTT_DS18B20_Rules.bin
+
           cd ..
           sha256sum ESPEasy_mega_20260720_ESP01_1M_SHT35_MQTT_DS18B20_Rules.bin > SHA256.txt
 
