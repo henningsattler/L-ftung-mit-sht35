@@ -16,6 +16,7 @@
 #define USES_P004                       // DS18B20 / Dallas 1-Wire temperature
 #define USES_P037                       // MQTT import
 #define USES_P068                       // SHT30/SHT31/SHT35 (SHT3x)
+#define USES_P153                       // SHT40/SHT41/SHT45 (SHT4x)
 // Required features
 #define FEATURE_RULES 1
 #define FEATURE_I2CMULTIPLEXER 1        // TCA9543A / TCA9548A etc.
