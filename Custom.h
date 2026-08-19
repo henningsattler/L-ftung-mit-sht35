@@ -15,6 +15,7 @@
 // Required sensor plugins
 #define USES_P004                       // DS18B20 / Dallas 1-Wire temperature
 #define USES_P037                       // MQTT import
+#define USES_P045                       // GY-521  Beschleunigung + Lage
 #define USES_P068                       // SHT30/SHT31/SHT35 (SHT3x)
 #define USES_P153                       // SHT40/SHT41/SHT45 (SHT4x)
 #define USES_P173                       // SHTc3 Temperatur + Luftfeuchte
